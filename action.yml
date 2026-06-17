@@ -25,7 +25,15 @@ runs:
         activate-environment: true
         python-version: "3.14"
 
+    # Pin Helm to the same version ess-helm's own integration-test CI uses. This action installs
+    # the ess-helm pytest harness (pyhelm3), which parses Helm's stdout as JSON; Helm v4 writes
+    # `Pulled:`/`Digest:` progress lines to stdout and breaks that parsing, so the test fixtures
+    # (cert-manager / prometheus-operator-crds) fail. ess-helm additionally avoids Helm >= 3.19.5
+    # because of https://github.com/helm/helm/issues/31643.
+    # ess-helm pin: https://github.com/element-hq/ess-helm/blob/0f8c65e426cf7b64e36cbb70002ebb909d5e6760/.github/workflows/pytest.yml#L199-L205
     - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4  # v4.3.1
+      with:
+        version: v3.19.4
 
     - name: Get current week number and home dir
       id: cache-input
